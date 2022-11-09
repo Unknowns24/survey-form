@@ -1,0 +1,58 @@
+version: "3.9"
+
+networks:
+    app-net:
+        driver: bridge
+    surveydb-net:
+        driver: bridge
+
+volumes:
+    surveyDB:
+
+services:
+    ################
+    ### DATABASE ###
+    ################
+    mysql:
+        container_name: mysql
+        image: mariadb:10.5.8
+        restart: always
+        environment:
+            MYSQL_DATABASE: "survey"
+            MYSQL_USER: "manager"
+            MYSQL_PASSWORD: "surveypassword"
+            MYSQL_ROOT_PASSWORD: "root"
+        ports:
+            - "3306:3306"
+        volumes:
+            - surveyDB:/var/lib/mysql
+        networks:
+            - surveydb-net
+
+    ###############
+    ### SERVERS ###
+    ###############
+    # web:
+    #     container_name: frontend
+    #     build: ./frontend
+    #     restart: always
+    #     expose:
+    #         - 3000
+    #     ports:
+    #         - "3000:3000"
+    #     volumes:
+    #         - ./frontend:/usr/src/surveyapp
+    #     networks:
+    #         - app-net
+    golang:
+        container_name: golang
+        build: ./backend
+        restart: always
+        ports:
+            - "8000:8000"
+        depends_on:
+            - mysql
+        volumes:
+            - ./backend:/usr/src/surveyapp
+        networks:
+            - surveydb-net
