@@ -19,15 +19,14 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	// Se verifica que se encuentren todos los campos necesarios
-	if jsonData["first_name"] == "" || jsonData["last_name"] == "" || jsonData["password"] == "" || jsonData["email"] == "" {
+	if jsonData["name"] == "" || jsonData["password"] == "" || jsonData["email"] == "" {
 		return c.SendString(utils.EndOutPut("{\"message\": \"ERRN103\"}"))
 	}
 
 	// Se crea el modelo del nuevo usuario
 	newUser := models.User{
 		Email:     strings.ToLower(jsonData["email"]),
-		FirstName: utils.Caser.String(strings.ToLower(jsonData["first_name"])),
-		LastName:  utils.Caser.String(strings.ToLower(jsonData["last_name"])),
+		Name:      utils.Caser.String(strings.ToLower(jsonData["name"])),
 		CreatedAt: time.Now(),
 	}
 
@@ -91,10 +90,28 @@ func Login(c *fiber.Ctx) error {
 	}
 
 	if keepLogin {
-		return c.SendString(utils.EndOutPut("{\"message\": \"SUCN101\", \"token\": \"" + token + "\", \"keepLogin\": \"" + jsonData["keeplogin"] + "\"}"))
+		cookie := fiber.Cookie{
+			Name:     "jwt",
+			Value:    token,
+			Expires:  time.Now().Add(time.Hour * 24 * 7),
+			HTTPOnly: true,
+		}
+
+		c.Cookie(&cookie)
+		return c.SendString(utils.EndOutPut("{\"message\": \"SUCN101\"}"))
+
 	}
 
-	return c.SendString(utils.EndOutPut("{\"message\": \"SUCN101\", \"token\": \"" + token + "\"}"))
+	cookie := fiber.Cookie{
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
+	}
+
+	c.Cookie(&cookie)
+
+	return c.SendString(utils.EndOutPut("{\"message\": \"SUCN101\"}"))
 }
 
 func Logout(c *fiber.Ctx) error {

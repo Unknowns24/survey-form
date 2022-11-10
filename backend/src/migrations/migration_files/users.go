@@ -17,8 +17,7 @@ func MigrateUsers() {
 	}
 
 	user := models.User{
-		FirstName: "Genaro",
-		LastName:  "Civilotti",
+		Name:      "Genaro",
 		Email:     "unknowns0074@gmail.com",
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),

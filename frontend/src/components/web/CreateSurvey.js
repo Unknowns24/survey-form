@@ -14,13 +14,20 @@ const CreateSurveyComponent = () => {
 	const [newOption, setNewOption] = useState("");
 	const [showCreateQuestion, setShowCreateQuestion] = useState(false);
 	const [newQuestion, setNewQuestion] = useState("");
-	const [newQuestionOption, setNewQuestionOption] = useState("");
+	const [newQuestionAnswers, setNewQuestionAnswers] = useState("");
 
 	const toogleCreate = (e) => {
 		var name = e.currentTarget.name;
 		if (name === "option") {
 			setShowCreateOption((prev) => !prev);
 		} else {
+			if (state.options.length < 1) {
+				Toast.fire({
+					icon: "error",
+					text: "Debes crear al menos una opcion antes de crear las preguntas!",
+				});
+				return;
+			}
 			setShowCreateQuestion((prev) => !prev);
 		}
 	};
@@ -50,7 +57,7 @@ const CreateSurveyComponent = () => {
 			setShowCreateOption(false);
 			setState((prev) => ({ ...prev, options: [...state.options, { value: uuidv4(), label: newOption }] }));
 		} else {
-			if (newQuestion === "" || newQuestionOption === "") {
+			if (newQuestion === "" || newQuestionAnswers === "") {
 				Toast.fire({
 					icon: "error",
 					text: "Completa los datos de la pregunta",
@@ -60,14 +67,19 @@ const CreateSurveyComponent = () => {
 
 			setNewQuestion("");
 			setShowCreateQuestion(false);
-			setState((prev) => ({ ...prev, questions: [...state.questions, { value: uuidv4(), text: newQuestion, option: newQuestionOption }] }));
+			setState((prev) => ({ ...prev, questions: [...state.questions, { value: uuidv4(), text: newQuestion, answers: newQuestionAnswers }] }));
 		}
 	};
 
-	const handleSelect = (e) => {
-		var value = e.currentTarget.value;
+	const deleteOption = (e) => {
+		var optionId = e.currentTarget.id;
 
-		setNewQuestionOption({ value: value, label: e.currentTarget.text() });
+		setState((prev) => ({
+			...prev,
+			options: state.options.filter(function (opt) {
+				return opt.value !== optionId;
+			}),
+		}));
 	};
 
 	const handleInput = (e) => {
@@ -121,8 +133,8 @@ const CreateSurveyComponent = () => {
 											<tr key={key}>
 												<td>{option.label}</td>
 												<td className="text-center">
-													<a id={option.value} name="option" className="mt-2" title="Cancel" data-toggle="tooltip" onClick={cancelCreate}>
-														<i className="fa fa-times text-danger"></i>
+													<a id={option.value} name="option" className="mt-2" title="Cancel" data-toggle="tooltip" onClick={deleteOption}>
+														<i className="fa fa-trash text-danger"></i>
 													</a>
 												</td>
 											</tr>
@@ -166,8 +178,7 @@ const CreateSurveyComponent = () => {
 							<table name="posibilities" className="table table-bordered">
 								<thead>
 									<tr>
-										<th className="col-6">Pretunta</th>
-										<th className="col-5">Inclinacion</th>
+										<th className="col-11">Pregunta</th>
 										<th className="col-1">Acciones</th>
 									</tr>
 								</thead>
@@ -177,7 +188,6 @@ const CreateSurveyComponent = () => {
 										return (
 											<tr key={key}>
 												<td>{question.text}</td>
-												<td>{question.option.label}</td>
 												<td className="text-center">
 													<a id={question.value} name="question" className="mt-2" title="Cancel" data-toggle="tooltip" onClick={cancelCreate}>
 														<i className="fa fa-times text-danger"></i>
@@ -186,45 +196,31 @@ const CreateSurveyComponent = () => {
 											</tr>
 										);
 									})}
-
-									{showCreateQuestion ? (
-										<tr>
-											<td>
-												<input type="text" name="questionValue" className="form-control" placeholder="Nueva Pregunta" value={newQuestion} onChange={handleCreateInput} />
-											</td>
-											<td>
-												<select className="form-select" name="questionOption" value={newQuestionOption} onChange={handleSelect}>
-													<option disabled value="">
-														Selecciona una opcion
-													</option>
-
-													{state.options.map((option, key) => {
-														return (
-															<option value={option.value} key={key}>
-																{option.label}
-															</option>
-														);
-													})}
-												</select>
-											</td>
-											<td>
-												<div className="container">
-													<div className="d-flex justify-content-between  text-center">
-														<a className="mt-2" name="question" title="Create" data-toggle="tooltip" onClick={confirmCreate}>
-															<i className="fa fa-check text-success"></i>
-														</a>
-														<a className="mt-2" name="question" title="Cancel" data-toggle="tooltip" onClick={cancelCreate}>
-															<i className="fa fa-times text-danger"></i>
-														</a>
-													</div>
-												</div>
-											</td>
-										</tr>
-									) : (
-										""
-									)}
 								</tbody>
 							</table>
+							<div class="modal" style={{ display: `${showCreateQuestion ? "block" : "none"}` }}>
+								<div class="modal-dialog" role="document">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title">Añadir pregunta</h5>
+											<button type="button" class="btn-close" onClick={toogleCreate} name="question" aria-label="Close">
+												<span aria-hidden="true"></span>
+											</button>
+										</div>
+										<div class="modal-body">
+											<p>Modal body text goes here.</p>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-success">
+												Guardar
+											</button>
+											<button onClick={toogleCreate} name="question" type="button" class="btn btn-outline-dark">
+												Cerrar
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
 							<div className="d-flex justify-content-center text-center mb-3">
 								<button id="add-new" type="button" className="btn btn-outline-warning add-new rounded-pill col-md-12" name="question" onClick={toogleCreate}>
 									<i className="fa fa-plus"></i> Añadir Pregunta
@@ -243,3 +239,19 @@ const CreateSurveyComponent = () => {
 };
 
 export default CreateSurveyComponent;
+
+/*
+<select className="form-select" name="questionOption" value={newQuestionOption} onChange={handleSelect}>
+													<option disabled value="">
+														Selecciona una opcion
+													</option>
+
+													{state.options.map((option, key) => {
+														return (
+															<option value={option.value} key={key}>
+																{option.label}
+															</option>
+														);
+													})}
+												</select>
+*/
