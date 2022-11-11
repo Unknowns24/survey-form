@@ -14,7 +14,9 @@ const CreateSurveyComponent = () => {
 	const [newOption, setNewOption] = useState("");
 	const [showCreateQuestion, setShowCreateQuestion] = useState(false);
 	const [newQuestion, setNewQuestion] = useState("");
-	const [newQuestionAnswers, setNewQuestionAnswers] = useState("");
+	const [newQuestionAnswers, setNewQuestionAnswers] = useState([]);
+	const [newAnswer, setNewAnswer] = useState({});
+	const [newAnswerOption, setNewAnswerOption] = useState("");
 
 	const toogleCreate = (e) => {
 		var name = e.currentTarget.name;
@@ -30,6 +32,12 @@ const CreateSurveyComponent = () => {
 			}
 			setShowCreateQuestion((prev) => !prev);
 		}
+	};
+
+	const handleSelect = (e) => {
+		var value = e.currentTarget.value;
+
+		setNewAnswerOption({ value: value, label: e.currentTarget.text() });
 	};
 
 	const cancelCreate = (e) => {
@@ -71,6 +79,16 @@ const CreateSurveyComponent = () => {
 		}
 	};
 
+	const deleteAnswer = (e) => {
+		var answerId = e.currentTarget.id;
+
+		setNewQuestionAnswers(
+			newQuestionAnswers.filter(function (ans) {
+				return ans.key !== answerId;
+			})
+		);
+	};
+
 	const deleteOption = (e) => {
 		var optionId = e.currentTarget.id;
 
@@ -80,6 +98,11 @@ const CreateSurveyComponent = () => {
 				return opt.value !== optionId;
 			}),
 		}));
+	};
+
+	const createAnswer = (e) => {
+		var inputName = e.currentTarget.name;
+		var value = e.currentTarget.value;
 	};
 
 	const handleInput = (e) => {
@@ -198,23 +221,70 @@ const CreateSurveyComponent = () => {
 									})}
 								</tbody>
 							</table>
-							<div class="modal" style={{ display: `${showCreateQuestion ? "block" : "none"}` }}>
-								<div class="modal-dialog" role="document">
-									<div class="modal-content">
-										<div class="modal-header">
-											<h5 class="modal-title">Añadir pregunta</h5>
-											<button type="button" class="btn-close" onClick={toogleCreate} name="question" aria-label="Close">
+							<div className="modal" style={{ display: `${showCreateQuestion ? "block" : "none"}` }}>
+								<div className="modal-dialog" role="document">
+									<div className="modal-content">
+										<div className="modal-header">
+											<h5 className="modal-title">Añadir pregunta</h5>
+											<button type="button" className="btn-close" onClick={toogleCreate} name="question" aria-label="Close">
 												<span aria-hidden="true"></span>
 											</button>
 										</div>
-										<div class="modal-body">
-											<p>Modal body text goes here.</p>
+										<div className="modal-body">
+											<h6>Pregunta</h6>
+											<div className="mb-3">
+												<input type="text" name="question" className="form-control mt-1" placeholder="Pregunta" autoFocus value={newQuestion} onChange={handleCreateInput} />
+											</div>
+											<hr />
+											<h6>Crear Respuesta</h6>
+											<div className="mb-3">
+												<div className="mb-3">
+													<input type="text" name="question" className="form-control mt-1" placeholder="Encabezado" autoFocus value={newQuestion} onChange={handleCreateInput} />
+												</div>
+												<div className="mb-3">
+													<label htmlFor="questionAnswer">Inclinacion de la respuesta:</label>
+													<select className="form-select" name="questionOption" value={newAnswerOption} onChange={handleSelect}>
+														<option disabled value="">
+															Selecciona una opcion
+														</option>
+
+														{state.options.map((option, key) => {
+															return (
+																<option value={option.value} key={key}>
+																	{option.label}
+																</option>
+															);
+														})}
+													</select>
+												</div>
+												<div className="d-flex justify-content-center">
+													<button type="button" className="btn rounded-pill btn-outline-info btn-sm" onClick={createAnswer}>
+														agregar
+													</button>
+												</div>
+											</div>
+
+											<hr />
+											<h6>Respuestas</h6>
+
+											<ul className="list-group">
+												{newQuestionAnswers.map((ans, key) => {
+													return (
+														<li key={key} className="list-group-item d-flex justify-content-between align-items-center">
+															{ans.value}
+															<a id={ans.key} className="mt-2" title="Cancel" data-toggle="tooltip" onClick={deleteAnswer}>
+																<i className="fa fa-trash text-danger"></i>
+															</a>
+														</li>
+													);
+												})}
+											</ul>
 										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-success">
+										<div className="modal-footer">
+											<button type="button" className="btn btn-success">
 												Guardar
 											</button>
-											<button onClick={toogleCreate} name="question" type="button" class="btn btn-outline-dark">
+											<button onClick={toogleCreate} name="question" type="button" className="btn btn-outline-dark">
 												Cerrar
 											</button>
 										</div>
@@ -241,17 +311,5 @@ const CreateSurveyComponent = () => {
 export default CreateSurveyComponent;
 
 /*
-<select className="form-select" name="questionOption" value={newQuestionOption} onChange={handleSelect}>
-													<option disabled value="">
-														Selecciona una opcion
-													</option>
 
-													{state.options.map((option, key) => {
-														return (
-															<option value={option.value} key={key}>
-																{option.label}
-															</option>
-														);
-													})}
-												</select>
 */
