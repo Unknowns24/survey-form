@@ -15,7 +15,7 @@ const CreateSurveyComponent = () => {
 	const [showCreateQuestion, setShowCreateQuestion] = useState(false);
 	const [newQuestion, setNewQuestion] = useState("");
 	const [newQuestionAnswers, setNewQuestionAnswers] = useState([]);
-	const [newAnswer, setNewAnswer] = useState({});
+	const [newAnswer, setNewAnswer] = useState("");
 	const [newAnswerOption, setNewAnswerOption] = useState("");
 
 	const toogleCreate = (e) => {
@@ -37,7 +37,7 @@ const CreateSurveyComponent = () => {
 	const handleSelect = (e) => {
 		var value = e.currentTarget.value;
 
-		setNewAnswerOption({ value: value, label: e.currentTarget.text() });
+		setNewAnswerOption(value);
 	};
 
 	const cancelCreate = (e) => {
@@ -65,7 +65,7 @@ const CreateSurveyComponent = () => {
 			setShowCreateOption(false);
 			setState((prev) => ({ ...prev, options: [...state.options, { value: uuidv4(), label: newOption }] }));
 		} else {
-			if (newQuestion === "" || newQuestionAnswers === "") {
+			if (newQuestion === "" || newQuestionAnswers.length < 1) {
 				Toast.fire({
 					icon: "error",
 					text: "Completa los datos de la pregunta",
@@ -79,16 +79,6 @@ const CreateSurveyComponent = () => {
 		}
 	};
 
-	const deleteAnswer = (e) => {
-		var answerId = e.currentTarget.id;
-
-		setNewQuestionAnswers(
-			newQuestionAnswers.filter(function (ans) {
-				return ans.key !== answerId;
-			})
-		);
-	};
-
 	const deleteOption = (e) => {
 		var optionId = e.currentTarget.id;
 
@@ -100,9 +90,28 @@ const CreateSurveyComponent = () => {
 		}));
 	};
 
-	const createAnswer = (e) => {
-		var inputName = e.currentTarget.name;
-		var value = e.currentTarget.value;
+	const addAnswer = (e) => {
+		if (newAnswer === "" || newAnswerOption === "") {
+			Toast.fire({
+				icon: "error",
+				text: "Completa los datos de la respuesta que quieres añadir",
+			});
+			return;
+		}
+
+		setNewQuestionAnswers(() => [...newQuestionAnswers, { key: uuidv4(), value: newAnswer, inclination: newAnswerOption }]);
+		setNewAnswer("");
+		setNewAnswerOption("");
+	};
+
+	const deleteAnswer = (e) => {
+		var answerId = e.currentTarget.id;
+
+		setNewQuestionAnswers(
+			newQuestionAnswers.filter(function (ans) {
+				return ans.key !== answerId;
+			})
+		);
 	};
 
 	const handleInput = (e) => {
@@ -118,9 +127,34 @@ const CreateSurveyComponent = () => {
 
 		if (inputName === "optionValue") {
 			setNewOption(value);
-		} else {
-			setNewQuestion(value);
+		} else if (inputName === "questionValue") setNewQuestion(value);
+		else {
+			setNewAnswer(value);
 		}
+	};
+
+	const handleSubmit = (e) => {
+		e.preventDefault();
+
+		if (state.title === "" || state.description === "") {
+			Toast.fire({
+				icon: "error",
+				text: "Completa los datos basicos de la encuesta!",
+			});
+			return;
+		}
+
+		if (state.questions < 1) {
+			if (state.title === "" || state.description === "") {
+				Toast.fire({
+					icon: "error",
+					text: "La encuesta debe tener al menos una pregunta!",
+				});
+				return;
+			}
+		}
+
+		console.log(state);
 	};
 
 	return (
@@ -207,7 +241,6 @@ const CreateSurveyComponent = () => {
 								</thead>
 								<tbody>
 									{state.questions.map((question, key) => {
-										console.log(question);
 										return (
 											<tr key={key}>
 												<td>{question.text}</td>
@@ -233,13 +266,13 @@ const CreateSurveyComponent = () => {
 										<div className="modal-body">
 											<h6>Pregunta</h6>
 											<div className="mb-3">
-												<input type="text" name="question" className="form-control mt-1" placeholder="Pregunta" autoFocus value={newQuestion} onChange={handleCreateInput} />
+												<input type="text" name="questionValue" className="form-control mt-1" placeholder="Pregunta" autoFocus value={newQuestion} onChange={handleCreateInput} />
 											</div>
 											<hr />
 											<h6>Crear Respuesta</h6>
 											<div className="mb-3">
 												<div className="mb-3">
-													<input type="text" name="question" className="form-control mt-1" placeholder="Encabezado" autoFocus value={newQuestion} onChange={handleCreateInput} />
+													<input type="text" name="questionAnswer" className="form-control mt-1" placeholder="Encabezado" autoFocus value={newAnswer} onChange={handleCreateInput} />
 												</div>
 												<div className="mb-3">
 													<label htmlFor="questionAnswer">Inclinacion de la respuesta:</label>
@@ -258,7 +291,7 @@ const CreateSurveyComponent = () => {
 													</select>
 												</div>
 												<div className="d-flex justify-content-center">
-													<button type="button" className="btn rounded-pill btn-outline-info btn-sm" onClick={createAnswer}>
+													<button type="button" className="btn rounded-pill btn-outline-info btn-sm" onClick={addAnswer}>
 														agregar
 													</button>
 												</div>
@@ -281,7 +314,7 @@ const CreateSurveyComponent = () => {
 											</ul>
 										</div>
 										<div className="modal-footer">
-											<button type="button" className="btn btn-success">
+											<button name="question" type="button" className="btn btn-success" onClick={confirmCreate}>
 												Guardar
 											</button>
 											<button onClick={toogleCreate} name="question" type="button" className="btn btn-outline-dark">
@@ -298,7 +331,7 @@ const CreateSurveyComponent = () => {
 							</div>
 						</div>
 						<div className="mb-3"></div>
-						<button className="btn btn-primary w-100" type="submit">
+						<button className="btn btn-primary w-100" type="button" onClick={handleSubmit}>
 							Crear
 						</button>
 					</form>
@@ -309,7 +342,3 @@ const CreateSurveyComponent = () => {
 };
 
 export default CreateSurveyComponent;
-
-/*
-
-*/
