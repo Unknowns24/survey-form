@@ -14,6 +14,7 @@
 | SUCN100 | User registered |
 | SUCN101 |   User Logged   |
 | SUCN102 | User Logged out |
+| SUCN103 | Survey Created  |
 
 ### Error Codes
 

@@ -20,4 +20,7 @@ func Setup(app *fiber.App) {
 	authenticated.Get("/user", controllers.User)
 	authenticated.Post("/logout", controllers.Logout)
 
+	// Survey Routes //
+	authenticated.Post("/survey/create", controllers.CreateSurvey)
+
 }
