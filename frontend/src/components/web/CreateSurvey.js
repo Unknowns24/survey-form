@@ -1,3 +1,4 @@
+import { handleCreateSurvey } from "hooks/useSurvey";
 import React, { useState } from "react";
 import { Toast, uuidv4 } from "utils/prompts";
 
@@ -133,7 +134,7 @@ const CreateSurveyComponent = () => {
 		}
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 
 		if (state.title === "" || state.description === "") {
@@ -154,7 +155,7 @@ const CreateSurveyComponent = () => {
 			}
 		}
 
-		console.log(state);
+		await handleCreateSurvey(state);
 	};
 
 	return (

@@ -1,9 +1,7 @@
 import { load, login, logout } from "services/authService";
 import { setUserData, setUserError, setUserLoading } from "context/userSlice";
-/*
-import { getUserLicenses } from "services/licenseService";
-import { setLicenseList } from "context/licenseSlice";
-*/
+import { loadSurveys } from "services/surveyService";
+import { setSurveyList } from "context/surveySlice";
 
 export const userLogin = (credentials) => async (dispatch) => {
 	dispatch(setUserLoading(true)); // Set user loading
@@ -38,18 +36,16 @@ export const loadUser = () => async (dispatch) => {
 		return dispatch(setUserError({ exist: true, errorCode: data.message }));
 	}
 
-	// Load user licenses
-	/*
-	const licenses = await getUserLicenses().catch(() => {
-		return dispatch(setLicenseList({}));
+	// Load user Surveys
+	const surveys = await loadSurveys().catch(() => {
+		return dispatch(setSurveyList({}));
 	});
 
-	if (licenses.data.message !== undefined) {
-		return dispatch(setLicenseList({}));
+	if (surveys.data.message !== undefined) {
+		return dispatch(setSurveyList({}));
 	}
 
-	dispatch(setLicenseList(licenses.data));
-	*/
+	dispatch(setSurveyList(surveys.data));
 	dispatch(setUserData({ userData: data }));
 };
 

@@ -29,7 +29,7 @@ func (c *DbConfig) InitMysqlDB() *gorm.DB {
 		os.Exit(-1)
 	}
 
-	db.AutoMigrate(&models.User{}, &models.Migrations{})
+	db.AutoMigrate(&models.User{}, &models.Migrations{}, &models.Survey{})
 
 	return db
 }

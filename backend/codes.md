@@ -33,6 +33,7 @@
 | ERRN109 |             Error while generating a JWT             |  Login (userController.go)   |
 | ERRN110 |                     Bad Request                      |      userController.go       |
 | ERRN111 |      Error while unmarshal json (invalid json)       |      userController.go       |
+| ERRN112 |       Error while marshal json (invalid json)        |     surveyController.go      |
 |    -    |          **Codes returned by middlewares**           |              -               |
 | ERRN500 |                     Invalid JWT                      |  IsAuthenticated (auth.go)   |
 | ERRN501 |            The user in the JWT is Invalid            |  IsAuthenticated (auth.go)   |
