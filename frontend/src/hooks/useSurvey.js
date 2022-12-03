@@ -2,7 +2,7 @@ import { createSurvey } from "services/surveyService";
 import { Toast } from "utils/prompts";
 import codes from "config/codes.json";
 
-export const handleCreateSurvey = async ({ title, description, options, questions }) => {
+export const handleCreateSurvey = async ({ title, description, options, questions }, goto) => {
 	const res = await createSurvey({ title, description, options, questions }).catch(() => {
 		Toast.fire({
 			icon: "error",
@@ -18,5 +18,9 @@ export const handleCreateSurvey = async ({ title, description, options, question
 			icon: res.data.message.includes("SUCN") ? "success" : "error",
 			title: codes[res.data.message] ?? defaultMessage,
 		});
+
+		if (res.data.message.includes("SUCN")) {
+			goto("/");
+		}
 	}
 };

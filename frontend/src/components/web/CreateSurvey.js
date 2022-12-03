@@ -1,5 +1,6 @@
 import { handleCreateSurvey } from "hooks/useSurvey";
 import React, { useState } from "react";
+import { useNavigate, useNavigation } from "react-router-dom";
 import { Toast, uuidv4 } from "utils/prompts";
 
 const InitialState = {
@@ -18,6 +19,7 @@ const CreateSurveyComponent = () => {
 	const [newQuestionAnswers, setNewQuestionAnswers] = useState([]);
 	const [newAnswer, setNewAnswer] = useState("");
 	const [newAnswerOption, setNewAnswerOption] = useState("");
+	const navigation = useNavigate();
 
 	const toogleCreate = (e) => {
 		var name = e.currentTarget.name;
@@ -75,6 +77,7 @@ const CreateSurveyComponent = () => {
 			}
 
 			setNewQuestion("");
+			setNewQuestionAnswers([]);
 			setShowCreateQuestion(false);
 			setState((prev) => ({ ...prev, questions: [...state.questions, { value: uuidv4(), text: newQuestion, answers: newQuestionAnswers }] }));
 		}
@@ -155,7 +158,7 @@ const CreateSurveyComponent = () => {
 			}
 		}
 
-		await handleCreateSurvey(state);
+		await handleCreateSurvey(state, navigation);
 	};
 
 	return (
